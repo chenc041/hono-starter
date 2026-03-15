@@ -20,6 +20,8 @@
     "prisma:reset": "bunx prisma migrate reset",
     "seed:admin": "bun run src/scripts/create-admin.ts",
     "db:dev:up": "docker compose up -d db redis",
+    "db:dev:migrate": "bun run prisma:migrate --name",
+    "db:dev:migrate:auto": "bunx prisma migrate dev --name auto_$(date +%Y%m%d%H%M%S)",
     "db:dev:prepare": "bun run prisma:generate && bunx prisma migrate deploy",
     "db:dev:status": "bunx prisma migrate status",
     "db:dev:reset": "bun run prisma:reset",

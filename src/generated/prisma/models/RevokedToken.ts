@@ -982,6 +982,11 @@ export type RevokedTokenFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Skip the first `n` RevokedTokens.
    */
   skip?: number
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+   * 
+   * Filter by unique combinations of RevokedTokens.
+   */
   distinct?: Prisma.RevokedTokenScalarFieldEnum | Prisma.RevokedTokenScalarFieldEnum[]
 }
 

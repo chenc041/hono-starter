@@ -45,6 +45,47 @@ docker compose up --build
 ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=change-this-strong-pass bun run seed:admin
 ```
 
+## 命令速查（命令作用）
+
+### 应用运行
+
+- `bun run dev`：开发模式启动服务（会先自动执行 `db:dev:prepare`）。
+- `bun run start`：生产模式启动服务（会先自动执行 `db:prod:prepare`）。
+- `bun run check`：执行代码质量检查（`lint + typecheck`）。
+- `bun run test`：运行全部测试。
+- `bun run test:watch`：测试监听模式。
+
+### 数据库（开发）
+
+- `bun run db:dev:up`：启动本地开发数据库与 Redis（Docker）。
+- `bun run db:dev:prepare`：开发环境数据库准备（`prisma generate + migrate deploy`）。
+- `bun run db:dev:migrate <name>`：根据 schema 变更创建并应用开发迁移（手动命名）。
+- `bun run db:dev:migrate:auto`：自动时间戳命名创建并应用开发迁移。
+- `bun run db:dev:status`：查看当前迁移状态。
+- `bun run db:dev:reset`：重置本地数据库（会清空数据）。
+
+### 数据库（通用 Prisma）
+
+- `bun run prisma:generate`：生成 Prisma Client。
+- `bun run prisma:migrate --name <name>`：创建并应用开发迁移（原始 Prisma 命令封装）。
+- `bun run prisma:studio`：打开 Prisma Studio。
+- `bun run prisma:reset`：重置数据库（危险操作）。
+
+### 数据库（生产）
+
+- `bun run db:prod:prepare`：生产数据库准备（`prisma generate + migrate deploy`）。
+- `bun run db:prod:status`：查看生产迁移状态。
+
+### 管理员初始化
+
+- `bun run seed:admin`：创建或更新管理员账号（需传 `ADMIN_EMAIL` 和 `ADMIN_PASSWORD`）。
+
+示例：
+
+```bash
+ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='StrongPass123!' bun run seed:admin
+```
+
 ## 数据库操作指南（开发 / 生产）
 
 ### 开发阶段（本地）
@@ -68,10 +109,18 @@ bun run prisma:generate
 bunx prisma migrate deploy
 ```
 
-3. 当你修改了 `prisma/schema.prisma`，创建开发迁移
+3. 当你修改了 `prisma/schema.prisma`，必须先创建开发迁移
 
 ```bash
-bun run prisma:migrate --name add_user_auth
+bun run db:dev:migrate add_user_auth
+```
+
+不要跳过这一步，否则 `bun run dev` 里的 `db:dev:prepare` 只会执行已有迁移，不会自动生成新迁移。
+
+如果你不想手动命名，也可以使用自动时间戳命名：
+
+```bash
+bun run db:dev:migrate:auto
 ```
 
 4. 查看当前迁移状态（可选）
