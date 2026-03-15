@@ -1,12 +1,11 @@
-import { Hono } from "hono";
-import { userRouter } from "~/router/user";
+import { createApp } from "~/app";
+import { getEnv } from "~/core/config/env";
 
-const app = new Hono();
+const env = getEnv();
+const app = createApp();
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
-
-app.route("/user", userRouter);
-
-export default app;
+export default {
+  port: env.PORT,
+  fetch: app.fetch,
+  idleTimeout: 0,
+};

@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: hono_starter_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hono_starter
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: hono_starter_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    container_name: hono_starter_api
+    depends_on:
+      - db
+      - redis
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/hono_starter
+      JWT_SECRET: replace-me
+      ACCESS_TOKEN_EXPIRES_IN_SECONDS: 3600
+      REFRESH_TOKEN_EXPIRES_IN_DAYS: 7
+      RATE_LIMIT_MAX: 60
+      RATE_LIMIT_WINDOW_MS: 60000
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: http://localhost:5173
+      REQUEST_BODY_LIMIT_BYTES: 1048576
+      LOG_DIR: logs
+      LOG_RETENTION_DAYS: 14
+      LOG_LEVEL: info
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

@@ -1,11 +1,17 @@
 {
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "strict": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "types": ["bun"],
     "baseUrl": "./",
     "paths": {
       "~/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src", "test", "prisma.config.ts"]
 }

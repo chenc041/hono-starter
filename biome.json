@@ -6,13 +6,13 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "includes": ["**", "!src/generated"]
   },
   "formatter": {
     "enabled": true,
     "indentWidth": 2,
     "indentStyle": "space",
-    "lineWidth": 140
+    "lineWidth": 120
   },
   "linter": {
     "enabled": true,
@@ -22,7 +22,8 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "double",
+      "semicolons": "always"
     }
   },
   "assist": {
