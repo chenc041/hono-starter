@@ -2,6 +2,7 @@ import type { MiddlewareHandler } from "hono";
 import Redis from "ioredis";
 import { getEnv } from "~/core/config/env";
 import { AppError } from "~/core/errors/app-error";
+import { getAppLogger } from "~/core/logger";
 import type { AppEnv } from "~/types";
 
 export type RateLimitOptions = {
@@ -16,6 +17,30 @@ type ConsumeResult = {
 
 export interface RateLimiterBackend {
   consume(key: string, options: RateLimitOptions): Promise<ConsumeResult>;
+}
+
+type RedisConnectionEventSource = {
+  on(event: "error", listener: (error: Error) => void): unknown;
+  on(event: "ready", listener: () => void): unknown;
+};
+
+export function attachRedisConnectionErrorHandler(
+  redis: RedisConnectionEventSource,
+  reportError: (error: Error) => void,
+): void {
+  let errorReported = false;
+
+  redis.on("error", (error) => {
+    if (errorReported) {
+      return;
+    }
+
+    errorReported = true;
+    reportError(error);
+  });
+  redis.on("ready", () => {
+    errorReported = false;
+  });
 }
 
 type Bucket = {
@@ -55,6 +80,9 @@ export class RedisRateLimiterBackend implements RateLimiterBackend {
       lazyConnect: true,
       maxRetriesPerRequest: 1,
       enableOfflineQueue: false,
+    });
+    attachRedisConnectionErrorHandler(this.redis, (error) => {
+      getAppLogger().error.warn({ err: error }, "redis_rate_limiter_unavailable");
     });
   }
 

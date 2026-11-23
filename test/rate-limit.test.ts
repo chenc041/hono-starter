@@ -1,7 +1,9 @@
 import { describe, expect, test } from "bun:test";
+import { EventEmitter } from "node:events";
 import { Hono } from "hono";
 import { AppError } from "~/core/errors/app-error";
 import {
+  attachRedisConnectionErrorHandler,
   createRateLimitMiddleware,
   InMemoryRateLimiterBackend,
   type RateLimitOptions,
@@ -9,6 +11,26 @@ import {
 import type { AppEnv } from "~/types";
 
 describe("in-memory rate limiter", () => {
+  test("reports one Redis error per unavailable period and resets after recovery", () => {
+    const redis = new EventEmitter();
+    const reportError = (error: Error) => errors.push(error);
+    const errors: Error[] = [];
+
+    attachRedisConnectionErrorHandler(redis, reportError);
+
+    const firstError = new Error("connection refused");
+    const repeatedError = new Error("connection timeout");
+    const recoveredError = new Error("connection lost again");
+
+    redis.emit("error", firstError);
+    redis.emit("error", repeatedError);
+    expect(errors).toEqual([firstError]);
+
+    redis.emit("ready");
+    redis.emit("error", recoveredError);
+    expect(errors).toEqual([firstError, recoveredError]);
+  });
+
   test("allows the configured first requests and then blocks", async () => {
     const backend = new InMemoryRateLimiterBackend();
     const options: RateLimitOptions = { max: 2, windowMs: 60_000 };
