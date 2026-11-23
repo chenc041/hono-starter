@@ -22,6 +22,18 @@ afterEach(() => {
 });
 
 describe("loadEnvFiles", () => {
+  test("falls back to development for an invalid runtime environment", () => {
+    const dir = mkdtempSync(join(tmpdir(), "hono-env-invalid-"));
+    createdDirs.push(dir);
+
+    const env = loadEnvFiles({
+      cwd: dir,
+      nodeEnv: "invalid",
+    });
+
+    expect(env).toBe("development");
+  });
+
   test("loads env files with environment-specific precedence", () => {
     const dir = mkdtempSync(join(tmpdir(), "hono-env-"));
     createdDirs.push(dir);

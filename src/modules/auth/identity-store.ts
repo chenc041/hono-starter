@@ -16,7 +16,7 @@ export class PrismaAuthIdentityStore implements AuthIdentityStore {
       },
     });
 
-    if (!record || record.status !== "ACTIVE") {
+    if (record?.status !== "ACTIVE") {
       return null;
     }
 

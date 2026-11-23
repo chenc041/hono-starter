@@ -5,3 +5,4 @@ src/generated/prisma/
 .env
 logs/
 .DS_Store
+coverage/

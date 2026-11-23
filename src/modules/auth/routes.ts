@@ -63,7 +63,12 @@ function issueTokens(user: AuthUser) {
 }
 
 function decodeAccessToken(token: string): AccessPayload {
-  const decoded = jwt.verify(token, getEnv().JWT_SECRET);
+  let decoded: string | jwt.JwtPayload;
+  try {
+    decoded = jwt.verify(token, getEnv().JWT_SECRET);
+  } catch {
+    throw new AppError({ status: 401, code: "UNAUTHORIZED", message: "Invalid token" });
+  }
 
   if (typeof decoded === "string") {
     throw new AppError({ status: 401, code: "UNAUTHORIZED", message: "Invalid token" });
@@ -83,7 +88,12 @@ function decodeAccessToken(token: string): AccessPayload {
 }
 
 function decodeRefreshToken(token: string): RefreshPayload {
-  const decoded = jwt.verify(token, getEnv().JWT_SECRET);
+  let decoded: string | jwt.JwtPayload;
+  try {
+    decoded = jwt.verify(token, getEnv().JWT_SECRET);
+  } catch {
+    throw new AppError({ status: 401, code: "UNAUTHORIZED", message: "Invalid refresh token" });
+  }
 
   if (typeof decoded === "string") {
     throw new AppError({ status: 401, code: "UNAUTHORIZED", message: "Invalid refresh token" });

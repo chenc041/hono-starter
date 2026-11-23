@@ -28,6 +28,39 @@ function createTestApp() {
 }
 
 describe("app starter", () => {
+  test("GET /health returns service status", async () => {
+    const app = createTestApp();
+    const res = await app.request("/health");
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.data.status).toBe("ok");
+    expect(typeof body.data.timestamp).toBe("string");
+  });
+
+  test("GET /docs returns Swagger UI", async () => {
+    const app = createTestApp();
+    const res = await app.request("/docs");
+    const body = await res.text();
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    expect(body).toContain("SwaggerUIBundle");
+    expect(body).toContain("/openapi.json");
+  });
+
+  test("unknown route returns a structured 404", async () => {
+    const app = createTestApp();
+    const res = await app.request("/does-not-exist");
+    const body = await res.json();
+
+    expect(res.status).toBe(404);
+    expect(body.success).toBe(false);
+    expect(body.error.code).toBe("NOT_FOUND");
+    expect(body.error.requestId).toBeTruthy();
+  });
+
   test("GET / returns starter message and security headers", async () => {
     const app = createTestApp();
     const res = await app.request("/");
@@ -49,6 +82,15 @@ describe("app starter", () => {
     expect(res.headers.get("access-control-allow-origin")).toBe("http://localhost:5173");
   });
 
+  test("cors rejects an origin outside the allowlist", async () => {
+    const app = createTestApp();
+    const res = await app.request("/health", {
+      headers: { origin: "https://untrusted.example.com" },
+    });
+
+    expect(res.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
   test("blocks payload over limit", async () => {
     const app = createTestApp();
     const huge = "x".repeat(1024);
@@ -56,6 +98,20 @@ describe("app starter", () => {
       method: "POST",
       body: JSON.stringify({ email: "admin@example.com", password: huge }),
       headers: { "content-type": "application/json" },
+    });
+
+    expect(res.status).toBe(413);
+  });
+
+  test("blocks payload from content-length before reading the body", async () => {
+    const app = createTestApp();
+    const res = await app.request("/auth/login", {
+      method: "POST",
+      body: "{}",
+      headers: {
+        "content-type": "application/json",
+        "content-length": "513",
+      },
     });
 
     expect(res.status).toBe(413);
@@ -70,6 +126,39 @@ describe("app starter", () => {
     });
 
     expect(res.status).toBe(400);
+  });
+
+  test("POST /auth/login rejects unknown credentials", async () => {
+    const app = createTestApp();
+    const res = await app.request("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: "unknown@example.com", password: "admin12345" }),
+      headers: { "content-type": "application/json" },
+    });
+    const body = await res.json();
+
+    expect(res.status).toBe(401);
+    expect(body.error.code).toBe("INVALID_CREDENTIALS");
+  });
+
+  test("GET /auth/me rejects malformed bearer tokens", async () => {
+    const app = createTestApp();
+    const res = await app.request("/auth/me", {
+      headers: { authorization: "Bearer not-a-jwt" },
+    });
+
+    expect(res.status).toBe(401);
+  });
+
+  test("POST /auth/refresh rejects malformed refresh tokens", async () => {
+    const app = createTestApp();
+    const res = await app.request("/auth/refresh", {
+      method: "POST",
+      body: JSON.stringify({ refreshToken: "not-a-jwt" }),
+      headers: { "content-type": "application/json" },
+    });
+
+    expect(res.status).toBe(401);
   });
 
   test("POST /auth/login returns access and refresh token", async () => {
