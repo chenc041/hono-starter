@@ -109,13 +109,14 @@ bun run prisma:generate
 bunx prisma migrate deploy
 ```
 
-3. 当你修改了 `prisma/schema.prisma`，必须先创建开发迁移
+3. 当你修改了 `prisma/*.prisma` 中的模型定义，必须先创建开发迁移
 
 ```bash
 bun run db:dev:migrate add_user_auth
 ```
 
 不要跳过这一步，否则 `bun run dev` 里的 `db:dev:prepare` 只会执行已有迁移，不会自动生成新迁移。
+`prisma/schema.prisma` 保留 generator 和 datasource；模型按业务域放在同目录的其他 `.prisma` 文件中。
 
 如果你不想手动命名，也可以使用自动时间戳命名：
 
@@ -143,7 +144,7 @@ bun run db:dev:reset
 
 开发阶段你应该提交到仓库的数据库相关内容：
 
-- `prisma/schema.prisma`
+- `prisma/*.prisma`
 - `prisma/migrations/**`
 
 ### 生产阶段（线上）

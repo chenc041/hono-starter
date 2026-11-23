@@ -1,0 +1,37 @@
+model UserAuth {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  status       String   @default("ACTIVE")
+  lastLoginAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([status])
+}
+
+model RefreshToken {
+  id                  String    @id @default(cuid())
+  tokenHash           String    @unique
+  userId              String
+  email               String
+  expiresAt           DateTime
+  revokedAt           DateTime?
+  replacedByTokenHash String?
+  createdAt           DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RevokedToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String?
+  reason    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([expiresAt])
+  @@index([userId])
+}
