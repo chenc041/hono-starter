@@ -8,9 +8,8 @@
     "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "types": ["bun"],
-    "baseUrl": "./",
     "paths": {
-      "~/*": ["src/*"]
+      "~/*": ["./src/*"]
     }
   },
   "include": ["src", "test", "prisma.config.ts"]

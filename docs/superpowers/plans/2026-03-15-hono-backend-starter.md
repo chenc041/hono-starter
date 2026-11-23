@@ -15,6 +15,7 @@
 ### Task 1: Upgrade scripts and dependencies
 
 **Files:**
+
 - Modify: `package.json`
 - Modify: `tsconfig.json`
 - Modify: `biome.json`
@@ -27,6 +28,7 @@
 ### Task 2: Create runtime and app composition entry
 
 **Files:**
+
 - Create: `src/app.ts`
 - Modify: `src/index.ts`
 
@@ -40,6 +42,7 @@
 ### Task 3: Core middleware and error model
 
 **Files:**
+
 - Create: `src/core/errors/app-error.ts`
 - Create: `src/core/middleware/error-handler.ts`
 - Create: `src/core/middleware/request-id.ts`
@@ -54,6 +57,7 @@
 ### Task 4: Auth + health modules
 
 **Files:**
+
 - Create: `src/core/config/env.ts`
 - Create: `src/modules/health/routes.ts`
 - Create: `src/modules/auth/routes.ts`
@@ -66,6 +70,7 @@
 ### Task 5: Users module with Prisma
 
 **Files:**
+
 - Create: `src/db/client.ts`
 - Create: `src/modules/users/user.schema.ts`
 - Create: `src/modules/users/user.repository.ts`
@@ -82,6 +87,7 @@
 ### Task 6: Prisma schema and config
 
 **Files:**
+
 - Modify: `prisma/schema.prisma`
 - Modify: `prisma.config.ts`
 - Create: `.env.example`
@@ -93,6 +99,7 @@
 ### Task 7: OpenAPI docs endpoints
 
 **Files:**
+
 - Create: `src/openapi/spec.ts`
 - Create: `src/openapi/routes.ts`
 
@@ -104,6 +111,7 @@
 ### Task 8: Containerization and documentation
 
 **Files:**
+
 - Create: `Dockerfile`
 - Create: `docker-compose.yml`
 - Modify: `README.md`
