@@ -1,7 +1,7 @@
 # deps
 node_modules/
 .idea
-/generated/prisma
+src/generated/prisma/
 .env
 logs/
 .DS_Store
